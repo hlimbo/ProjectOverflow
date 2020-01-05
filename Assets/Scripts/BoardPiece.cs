@@ -45,10 +45,10 @@ public class BoardPiece : MonoBehaviour
     void OnTriggerStay2D(Collider2D collision)
     {
         var player = collision.GetComponent<KeyboardController>();
-        if(player != null)
+        if(player != null && BoardController.Instance.markerBoard[row][col] == 0)
         {
             player.OnInteractWith(gameObject, BoardController.Instance);
-        } 
+        }
     }
 
     public Neighbors IdentifyImmediateNeighbors(int row, int col, PlayerInfo info)

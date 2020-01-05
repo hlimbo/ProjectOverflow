@@ -18,6 +18,7 @@ public class GlobalTimer : MonoBehaviour
         {
             yield return new WaitForSeconds(1f);
             currentTime = currentTime < 0 ? 0 : currentTime - 1;
+            
         }
     }
 }

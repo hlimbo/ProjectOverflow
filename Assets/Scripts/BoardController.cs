@@ -1,11 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BoardController : MonoBehaviour
 {
     public const int FREE_SPOT = 0;
 
+    public float current_time;
+    public GlobalTimer timer;
     public GameObject boardPiecePrefab;
     public int dimension;
     [SerializeField]
@@ -19,12 +22,17 @@ public class BoardController : MonoBehaviour
     public BoardPiece[][] BoardPieces { get { return boardPieces; } }
     public float[][] timeSpanBoard; // measured in seconds
     public int[][] markerBoard;
+    public int[][] checkBoard;
+
+
 
     public KeyboardController player1;
     public KeyboardController player2;
 
     private static BoardController instance = null;
     public static BoardController Instance { get { return instance; } }
+
+    public int turn = 1;
 
     void Awake()
     {
@@ -33,16 +41,32 @@ public class BoardController : MonoBehaviour
 
         timeSpanBoard = new float[dimension][];
         markerBoard = new int[dimension][];
-        for(int r = 0;r < dimension; ++r)
+        checkBoard = new int[dimension][];
+
+        for (int r = 0;r < dimension; ++r)
         {
             timeSpanBoard[r] = new float[dimension];
             markerBoard[r] = new int[dimension];
-            for(int c = 0;c < dimension; ++c)
+            checkBoard[r] = new int[dimension];
+
+            for (int c = 0;c < dimension; ++c)
             {
                 timeSpanBoard[r][c] = 0f;
                 markerBoard[r][c] = FREE_SPOT;
+                checkBoard[r][c] = 0;
             }
         }
+
+        //for (int r = 0; r < dimension; ++r)
+        //{
+        //    for (int c = 0; c < dimension; ++c)
+        //    {
+        //        checkBoard[r][c] = 0;
+        //    }
+        //}
+
+        //setting time
+        current_time = Time.time;
 
         // debugging
         PrintBoards();
@@ -64,6 +88,35 @@ public class BoardController : MonoBehaviour
                 boardPieces[r][c].SetCoords(r, c);
             }
         }
+    }
+
+
+    public List<BoardPiece> getAllNeighbors(int row, int col)
+    {
+        List<BoardPiece> return_bps = new List<BoardPiece>();
+        int original_row = row;
+        int original_col = col;
+        int[,] offsets = {{ 0, 1 }, { 1, 0 }, { 0, -1 }, { -1, 0 }};
+        for (int i = 0; i < 4; i++)
+        {
+            row = original_row + offsets[i,0];
+            col = original_col + offsets[i,1];
+            if (!(row < 0 || row >= dimension || col < 0 || col >= dimension))
+            {
+                if (markerBoard[row][col] == turn && checkBoard[row][col] == 0)
+                {
+                    return_bps.Add(BoardPieces[row][col]);
+                    checkBoard[row][col] = 1;
+                    foreach (BoardPiece bp in getAllNeighbors(row, col))
+                    {
+                        return_bps.Add(bp);
+                    }
+                    
+                }
+            }
+        }
+        return return_bps;
+        
     }
 
     private void UpdateBoard(float deltaTime)
@@ -89,11 +142,61 @@ public class BoardController : MonoBehaviour
                 boardPieces[r][c].TimerText.text = Mathf.CeilToInt(secondsLeft).ToString();
             }
         }
+
     }
 
     void Update()
     {
+        if(Time.time - current_time >= 2)
+        {
+            current_time = Time.time;
+            turn = turn == 1 ? 2 : 1;
+            //timer.GetComponent<Text>().color = turn == 1 ? Color.green : Color.cyan; //new Color(0, 255, 26) : new Color(0, 180, 255);
+            Camera.main.backgroundColor = turn == 1 ? Color.green : Color.cyan; //new Color(0, 255, 26) : new Color(0, 180, 255);
+        }
+
+        //// 1. determine who won
+        ////      -> counting number of colored squares per player
+        /////     -> rearrange colors by having winner's colors appear first on top left corner of screen
+        /////     -> place loser's color as remaining slots to fill on board
+        ///// 2. Add replay button to show up on screen
+        ///// 
+        //if (timer.currentTime < 0)
+        //{
+        //    int one_counter = 0;
+        //    int two_counter = 0;
+
+        //    for (int r = 0; r < dimension; r++)
+        //    {
+        //        for (int c = 0; c < dimension; c++)
+        //        {
+        //            if (markerBoard[r][c] == 1) {
+        //                one_counter += 1;
+        //            }
+        //            else if (markerBoard[r][c] == 2)
+        //            {
+        //                two_counter += 1;
+        //            }
+        //        }
+        //    }
+        //    int winner = one_counter > two_counter ? 1 : 2;
+        //    for(int r = 0; r < dimension; r++)
+        //    {
+        //        for(int c = 0; c < dimension; c++)
+        //        {
+        //            if(winner == 1)
+        //            {
+        //                markerBoard
+        //            }
+        //        }
+        //    }
+        //}
+
+        
+        //}
         UpdateBoard(Time.deltaTime);
+
+
     }
 
     public void PrintBoards()

@@ -312,7 +312,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 305883540}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -604,11 +604,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d008b319cfa815e4db372c2a9ec7a479, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  timer: {fileID: 305883544}
   boardPiecePrefab: {fileID: 7420601187302148902, guid: 403fce4a9d0acb24c930f22201826114,
     type: 3}
-  dimension: 5
+  dimension: 10
   boardPieceLength: 10
-  padding: 10
+  padding: 0.25
   player1: {fileID: 0}
   player2: {fileID: 0}
 --- !u!4 &801959216
